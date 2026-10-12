@@ -1,86 +1,50 @@
 # TradeVerified
 
-The verified professional network for skilled trades workers and the companies that hire them.
+The professional network for skilled trades. HVAC technicians, plumbers, electricians, welders, carpenters, mechanics, and pipefitters keep a profile a shop can actually read. Employers search by trade and ticket, post jobs, and move applicants from new to hired.
 
-## Overview
+This repository is the working product: marketing site, marketplace, profiles, jobs, messages, groups, and hiring dashboard.
 
-TradeVerified is a LinkedIn-style SaaS platform built for the skilled trades. HVAC technicians, plumbers, electricians, welders, carpenters, mechanics, and construction workers build verified profiles, showcase portfolio work, earn proof-backed reviews, and apply to jobs. Employers post roles, search verified talent, and hire with confidence.
+## Run it
 
-This repository contains the product marketing site and design preview (`index.html`), along with case study documentation for the full product concept.
+```bash
+npm install
+npm run dev
+```
 
-## Problem
+Open [http://localhost:3000](http://localhost:3000).
 
-Skilled trades hiring still runs on trust that is hard to prove. Workers lose jobs to cheaper, unverified competitors. Employers waste time and money on resumes that hide fake licenses and weak work history. Generic job boards and social networks were not built around trade licenses, certifications, or portfolio craftsmanship.
+```bash
+npm test
+npm run build
+```
 
-## Solution
+## Try the workspace
 
-TradeVerified makes trust visible. Workers create free profiles, upload credentials, and earn verification badges that show how and where each license was checked. Employers search by trade, certification, and location, then review portfolios and proof-backed ratings before hiring. Pricing stays worker-first: free to find work, optional Pro for visibility, and employer subscriptions for hiring tools.
+Accounts and marketplace data are saved in this browser. Two sample logins are on the sign-in page:
 
-## My Role
+| Who | Email | Password |
+| --- | --- | --- |
+| Marcus Rivera, HVAC tech | marcus.rivera@tradeverified.app | demo1234 |
+| Ethan Reynolds, Bluewater Plumbing | ethan.reynolds@bluewater.co | demo1234 |
 
-- Product Designer
-- UX/UI Designer
-- Frontend Developer
-- Project Manager
+Reset the sample marketplace any time from the account menu.
 
-## Process
+## What you can do
 
-1. Discovery
-2. Research
-3. Wireframes
-4. Design
-5. Development
-6. Testing
-7. Launch
+- Search tradespeople by name, trade, city, license, insurance, background check, OSHA, and years.
+- Open a profile and read each credential’s source, reference, and expiration. Expired tickets stay visible.
+- Save people and jobs, message from a profile, and leave a review that requires a proof reference.
+- Apply to a job as a tradesperson and track the status.
+- As an employer, post a job, shortlist applicants, and update the company page.
+- Add portfolio photos and credentials to your own profile. A workspace check confirms the reference shape and expiration date, and the badge says that is what was checked. It does not call a state licensing board.
+- Join a trade group, read the hiring guides, and turn on Free, Pro, or Employer for the account in this browser.
 
-## Tech Stack
+Plans update the account locally. Card billing is not connected.
 
-- HTML / CSS / JavaScript (marketing site)
-- Figma (product UI and brand)
-- Next.js (full app architecture)
-- React
-- TypeScript
+## Stack
+
+- Next.js, React, TypeScript
 - Tailwind CSS
-- Supabase (auth, database, storage)
-- Stripe (subscriptions)
-- PostgreSQL
-- Vercel (app deployment target)
+- Browser storage for accounts, messages, applications, and uploads
 
-## Features
-
-- Verified tradesperson profiles with licenses and certifications
-- Before/after portfolio uploads
-- Proof-backed customer reviews
-- Marketplace search by trade, location, and credentials
-- Employer job posting and candidate management
-- Automated and manual credential verification with visible provenance
-- Free worker plan plus optional Pro and Employer pricing
-- Dark / light theme support on the marketing site
-
-## Screenshots
-
-### Landing page
-![TradeVerified landing page](screenshots/tv-landing.png)
-
-### Worker marketplace
-![TradeVerified marketplace search](screenshots/tv-marketplace.png)
-
-### Verified profile
-![TradeVerified verified profile](screenshots/tv-profile.png)
-
-### Employer dashboard
-![TradeVerified employer dashboard](screenshots/tv-dashboard.png)
-
-## Live Demo
-
-[Open the marketing site](https://ogxmaxeimus.github.io/tradeverified/)
-
-*(After GitHub Pages is enabled, or open `index.html` locally.)*
-
-## Case Study
-
-[View case study in Brandon Fonville Creative Studio](https://github.com/ogxmaxeimus/brandon-fonville-studio)
-
-## Status
-
-Concept
+The design references in `screenshots/` are the earlier product studies. The app is the thing to use.
