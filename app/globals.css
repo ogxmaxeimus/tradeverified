@@ -49,8 +49,6 @@ body {
   font-family: var(--font-sans);
 }
 ::selection { background: #bfdbfe; color: #0f172a; }
-button, input, select, textarea { font: inherit; color: inherit; }
-a { color: inherit; }
 
 .hero-grid {
   background-image:

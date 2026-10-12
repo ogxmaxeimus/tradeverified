@@ -142,7 +142,9 @@ function NetworkInner() {
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h1 className="text-2xl font-extrabold tracking-tight">{results.length} verified professionals</h1>
-              <p className="text-sm text-muted">{location ? `Matching ${location}` : "Across every city in the workspace"}</p>
+              <p className="text-sm text-muted">
+                {[trades.length ? trades.join(", ") : "All trades", location ? location : "every city"].join(" · ")}
+              </p>
             </div>
             <label className="text-sm">
               <span className="sr-only">Sort</span>
