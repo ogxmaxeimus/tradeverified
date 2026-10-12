@@ -1,4 +1,8 @@
+node_modules
+.next
+out
 .DS_Store
 *.log
 .vscode/
 .idea/
+tsconfig.tsbuildinfo

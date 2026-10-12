@@ -1,0 +1,728 @@
+import { SEED_POSTS } from "./content";
+import type {
+  AppState,
+  Application,
+  Company,
+  Credential,
+  Job,
+  Message,
+  Notification,
+  PortfolioItem,
+  Professional,
+  Review,
+  Thread,
+  User,
+} from "./types";
+import { DEMO_PASSWORD } from "./types";
+
+function cred(
+  id: string,
+  name: string,
+  detail: string,
+  issuer: string,
+  issued: string,
+  expires: string,
+  reference: string,
+  source: string,
+  status: Credential["status"] = "verified",
+): Credential {
+  return { id, name, detail, issuer, issued, expires, status, source, reference };
+}
+
+function work(id: string, title: string, location: string, summary: string): PortfolioItem {
+  return { id, title, location, summary };
+}
+
+function review(
+  id: string,
+  author: string,
+  location: string,
+  rating: number,
+  body: string,
+  createdAt: string,
+  tags: string[],
+  proof: string,
+): Review {
+  return { id, author, location, rating, body, createdAt, tags, proof };
+}
+
+const users: User[] = [
+  user("u_marcus", "marcus.rivera@tradeverified.app", "Marcus Rivera", "worker", "pro", "p_marcus"),
+  user("u_derek", "derek.harrison@tradeverified.app", "Derek Harrison", "worker", "pro", "p_derek"),
+  user("u_michael", "michael.torres@tradeverified.app", "Michael Torres", "worker", "free", "p_michael"),
+  user("u_ryan", "ryan.mitchell@tradeverified.app", "Ryan Mitchell", "worker", "free", "p_ryan"),
+  user("u_luis", "luis.martinez@tradeverified.app", "Luis Martinez", "worker", "pro", "p_luis"),
+  user("u_brandon", "brandon.jeffers@tradeverified.app", "Brandon Jeffers", "worker", "free", "p_brandon"),
+  user("u_sarah", "sarah.thompson@tradeverified.app", "Sarah Thompson", "worker", "pro", "p_sarah"),
+  user("u_james", "james.walker@tradeverified.app", "James Walker", "worker", "free", "p_james"),
+  user("u_ethan_c", "ethan.collins@tradeverified.app", "Ethan Collins", "worker", "free", "p_ethan_c"),
+  user("u_liam", "liam.carter@tradeverified.app", "Liam Carter", "worker", "free", "p_liam"),
+  user("u_noah", "noah.patel@tradeverified.app", "Noah Patel", "worker", "free", "p_noah"),
+  user("u_sophie", "sophie.martin@tradeverified.app", "Sophie Martin", "worker", "free", "p_sophie"),
+  user("u_ewalsh", "ethan.walsh@tradeverified.app", "Ethan Walsh", "worker", "free", "p_ewalsh"),
+  user("u_maya", "maya.chen@tradeverified.app", "Maya Chen", "worker", "pro", "p_maya"),
+  user("u_brooks", "andre.brooks@tradeverified.app", "Andre Brooks", "worker", "free", "p_brooks"),
+  user("u_priya", "priya.shah@tradeverified.app", "Priya Shah", "worker", "free", "p_priya"),
+  user("u_ethan", "ethan.reynolds@bluewater.co", "Ethan Reynolds", "employer", "employer", undefined, "c_bluewater"),
+  user("u_hill", "alicia.nguyen@hillcountry.example", "Alicia Nguyen", "employer", "employer", undefined, "c_hill"),
+  user("u_pacific", "andre.cole@pacifictrade.example", "Andre Cole", "employer", "employer", undefined, "c_pacific"),
+];
+
+function user(
+  id: string,
+  email: string,
+  name: string,
+  role: User["role"],
+  plan: User["plan"],
+  professionalId?: string,
+  companyId?: string,
+): User {
+  return {
+    id,
+    email,
+    password: DEMO_PASSWORD,
+    name,
+    role,
+    plan,
+    createdAt: "2025-11-02T15:00:00.000Z",
+    professionalId,
+    companyId,
+  };
+}
+
+const companies: Company[] = [
+  {
+    id: "c_bluewater",
+    ownerId: "u_ethan",
+    slug: "bluewater-plumbing",
+    name: "Bluewater Plumbing",
+    location: "Vancouver, BC",
+    focus: "Plumbing",
+    website: "https://bluewater.example",
+    views: 362,
+    about:
+      "Service and construction plumbing across Metro Vancouver. We hire licensed plumbers, pipefitters, and the occasional HVAC tech for mechanical rooms we already maintain.",
+  },
+  {
+    id: "c_hill",
+    ownerId: "u_hill",
+    slug: "hill-country-mechanical",
+    name: "Hill Country Mechanical",
+    location: "Austin, TX",
+    focus: "HVAC",
+    website: "https://hillcountry.example",
+    views: 148,
+    about:
+      "Residential and light commercial mechanical contractor. Summer is a second payroll. We keep a bench of install leads and service electricians.",
+  },
+  {
+    id: "c_pacific",
+    ownerId: "u_pacific",
+    slug: "pacific-trade-co",
+    name: "Pacific Trade Co",
+    location: "San Diego, CA",
+    focus: "Construction",
+    website: "https://pacifictrade.example",
+    views: 96,
+    about:
+      "A small general contractor that self-performs finish carpentry and subcontracts structural steel. We hire people whose portfolios match the street we are working on.",
+  },
+];
+
+const professionals: Professional[] = [
+  {
+    id: "p_marcus",
+    userId: "u_marcus",
+    slug: "marcus-rivera",
+    name: "Marcus Rivera",
+    trade: "HVAC",
+    title: "Licensed HVAC Technician",
+    city: "Austin",
+    region: "TX",
+    years: 11,
+    rate: "$48–70/hr",
+    availability: "Booking 2 weeks",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: true,
+    views: 428,
+    skills: ["EPA 608", "Heat pumps", "Duct design", "Commissioning"],
+    about:
+      "I run service and changeouts for homes and small commercial buildings around Austin. Most of my work is heat pumps, attic furnaces, and the duct problems that make a new unit look bad. I photograph the nameplate and the finished install on every job.",
+    credentials: [
+      cred("c_m1", "EPA 608 Certification", "Type II Universal", "EPA", "2021-05-12", "2028-05-12", "EPA-608-44190", "Issuing body record"),
+      cred("c_m2", "NATE Certification", "Core & Heat Pumps", "NATE", "2021-03-03", "2027-03-03", "NATE-HP-22018", "Issuing body record"),
+      cred("c_m3", "Texas ACR Contractor", "Class A", "TDLR", "2022-01-20", "2028-01-20", "TACR-A-190442", "State license board record"),
+    ],
+    portfolio: [
+      work("w_m1", "Central AC installation", "Austin, TX", "3-ton heat pump on a 1978 ranch. Replaced a crushed return and balanced the bedrooms."),
+      work("w_m2", "Furnace replacement", "Pflugerville, TX", "80% furnace swapped for a 96% with a new flue and condensate route."),
+      work("w_m3", "Ductwork upgrade", "Manor, TX", "Ripped out a sagging flex trunk and rebuilt the supply in rigid."),
+      work("w_m4", "Thermostat and zoning", "Austin, TX", "Two-zone upgrade so the west bedrooms stop cooking in August."),
+    ],
+    reviews: [
+      review("r_m1", "Sarah Collins", "Austin, TX", 5, "Showed up on time, found a failed capacitor and a leaking drain, and had the system running the same afternoon.", "2026-10-10T18:00:00.000Z", ["AC repair", "Professional"], "Invoice #4412"),
+      review("r_m2", "Owen Blake", "Pflugerville, TX", 5, "The furnace quote matched the work. He labeled the disconnect and walked us through the filter.", "2026-09-22T18:00:00.000Z", ["Install"], "Job HC-229"),
+      review("r_m3", "Lena Ortiz", "Manor, TX", 4, "Duct job took a day longer than planned because of a buried trunk, and he told us before he opened the ceiling.", "2026-08-14T18:00:00.000Z", ["Ductwork"], "Invoice #4388"),
+    ],
+  },
+  {
+    id: "p_derek",
+    userId: "u_derek",
+    slug: "derek-harrison",
+    name: "Derek Harrison",
+    trade: "Electrical",
+    title: "Master Electrician",
+    city: "San Diego",
+    region: "CA",
+    years: 16,
+    rate: "$65–90/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: true,
+    views: 512,
+    skills: ["Service upgrades", "Panels", "EV chargers", "Troubleshooting"],
+    about:
+      "Master electrician in San Diego. I do service upgrades, panel replacements, and the troubleshooting calls other shops have already visited once. Permits are part of the job, not an extra.",
+    credentials: [
+      cred("c_d1", "California C-10", "Electrical contractor", "CSLB", "2018-06-01", "2028-06-01", "C10-1044881", "State license board record"),
+      cred("c_d2", "OSHA 30", "Construction", "OSHA", "2024-02-11", "2029-02-11", "OSHA30-88311", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_d1", "200A service upgrade", "North Park, San Diego", "Overhead to underground conversion with a new main and labeled circuits."),
+      work("w_d2", "EV charger on a subpanel", "La Jolla, CA", "Load calc, permit, and a 48A charger that did not nuisance-trip the range."),
+    ],
+    reviews: [
+      review("r_d1", "Chris Nguyen", "San Diego, CA", 5, "Panel was labeled, inspection passed the first time, and he texted the permit number the day he pulled it.", "2026-10-06T18:00:00.000Z", ["Panel", "Permit"], "Permit E-22910"),
+      review("r_d2", "Holly Grant", "La Jolla, CA", 5, "Clear price for the charger. He caught a warm breaker the old panel was hiding.", "2026-09-02T18:00:00.000Z", ["EV"], "Invoice #1902"),
+    ],
+  },
+  {
+    id: "p_michael",
+    userId: "u_michael",
+    slug: "michael-torres",
+    name: "Michael Torres",
+    trade: "Plumbing",
+    title: "Plumbing Expert",
+    city: "Chula Vista",
+    region: "CA",
+    years: 12,
+    rate: "$55–80/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: false,
+    featured: false,
+    views: 266,
+    skills: ["Repipes", "Water heaters", "Drain lining", "Gas"],
+    about:
+      "Service plumber based in Chula Vista. Water heaters, gas lines, and the repipes that start as a 'small leak' under a slab. I leave a written scope before I open a wall.",
+    credentials: [
+      cred("c_mt1", "California C-36", "Plumbing contractor", "CSLB", "2019-04-18", "2027-04-18", "C36-998120", "State license board record"),
+    ],
+    portfolio: [
+      work("w_mt1", "Tankless water heater", "Chula Vista, CA", "Gas upsized, condensate to the exterior, and the old tank hauled the same day."),
+      work("w_mt2", "Bathroom repipe", "Bonita, CA", "Copper to PEX in a occupied house. Water was back on before dinner."),
+    ],
+    reviews: [
+      review("r_mt1", "Elena Vazquez", "Chula Vista, CA", 5, "He found the slab leak with a meter instead of guessing, then gave us a price before any jackhammer.", "2026-10-04T18:00:00.000Z", ["Leak"], "Invoice #772"),
+      review("r_mt2", "Ben Cho", "Bonita, CA", 4, "Solid repipe. The drywall patch was left for our painter, which he said up front.", "2026-07-19T18:00:00.000Z", ["Repipe"], "Job CV-118"),
+    ],
+  },
+  {
+    id: "p_ryan",
+    userId: "u_ryan",
+    slug: "ryan-mitchell",
+    name: "Ryan Mitchell",
+    trade: "Carpentry",
+    title: "Carpenter",
+    city: "La Mesa",
+    region: "CA",
+    years: 7,
+    rate: "$40–58/hr",
+    availability: "Booking 2 weeks",
+    licensed: false,
+    insured: true,
+    backgroundChecked: false,
+    osha: true,
+    featured: false,
+    views: 141,
+    skills: ["Finish carpentry", "Doors", "Trim", "Decks"],
+    about:
+      "Finish carpenter. Doors, trim, and decks in east county San Diego. I am insured and I work under a GC's license when the job requires a contractor of record. I do not pretend to hold a CSLB number I don't have.",
+    credentials: [
+      cred("c_ry1", "OSHA 10", "Construction", "OSHA", "2025-01-09", "2030-01-09", "OSHA10-22019", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_ry1", "Interior door package", "La Mesa, CA", "Eleven doors hung, cased, and painted-ready in a flip on Waite Drive."),
+      work("w_ry2", "Cedar deck repair", "El Cajon, CA", "Replaced rotten joists and kept the rails the owner wanted to match."),
+    ],
+    reviews: [
+      review("r_ry1", "Kim Alvarez", "La Mesa, CA", 5, "Doors close, reveals are even, and he protected the floors. Would hire him on the next house.", "2026-09-28T18:00:00.000Z", ["Finish"], "PO 441"),
+    ],
+  },
+  {
+    id: "p_luis",
+    userId: "u_luis",
+    slug: "luis-martinez",
+    name: "Luis Martinez",
+    trade: "HVAC",
+    title: "HVAC Technician",
+    city: "San Diego",
+    region: "CA",
+    years: 9,
+    rate: "$42–62/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: true,
+    views: 305,
+    skills: ["Maintenance", "Refrigerant", "Commercial RTUs", "IAQ"],
+    about:
+      "Commercial and residential service tech. I spend most weeks on rooftop units in San Diego and the maintenance contracts that keep them from dying in September.",
+    credentials: [
+      cred("c_l1", "EPA 608", "Universal", "EPA", "2020-08-14", "2028-08-14", "EPA-608-19002", "Issuing body record"),
+      cred("c_l2", "NATE", "Air conditioning", "NATE", "2023-05-02", "2027-05-02", "NATE-AC-7712", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_l1", "RTU compressor swap", "Mission Valley, CA", "Diagnosed a grounded compressor and had the store open the next morning."),
+      work("w_l2", "Filter and belt program", "Kearny Mesa, CA", "Twelve rooftops put on a quarterly sheet the facility manager can actually read."),
+    ],
+    reviews: [
+      review("r_l1", "Facility Desk", "San Diego, CA", 5, "He is the tech we ask for by name. Writes the model number on the work order.", "2026-10-01T18:00:00.000Z", ["Commercial"], "WO 5501"),
+      review("r_l2", "Dana Ruiz", "San Diego, CA", 4, "Home visit was straightforward. Quoted a capacitor, did not upsell a system we did not need.", "2026-06-11T18:00:00.000Z", ["Service"], "Invoice #220"),
+    ],
+  },
+  {
+    id: "p_brandon",
+    userId: "u_brandon",
+    slug: "brandon-jeffers",
+    name: "Brandon Jeffers",
+    trade: "Welding",
+    title: "Certified Welder",
+    city: "National City",
+    region: "CA",
+    years: 14,
+    rate: "$46–68/hr",
+    availability: "Limited",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: false,
+    views: 198,
+    skills: ["SMAW", "FCAW", "Structural", "D1.1"],
+    about:
+      "Structural welder. AWS D1.1 tickets current for plate. I travel for shutdowns and I also take shop work around the south bay when I am home.",
+    credentials: [
+      cred("c_b1", "AWS D1.1", "SMAW 3G/4G", "American Welding Society", "2025-11-02", "2027-11-02", "AWS-D11-55210", "Issuing body record"),
+      cred("c_b2", "OSHA 30", "Construction", "OSHA", "2024-09-01", "2029-09-01", "OSHA30-44190", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_b1", "Moment frame repairs", "National City, CA", "Field welds on a retrofit, coupons pulled and accepted."),
+      work("w_b2", "Handrail package", "Chula Vista, CA", "Shop-built rails, galvanized, and set without a return trip."),
+    ],
+    reviews: [
+      review("r_b1", "Pacific Trade Co", "San Diego, CA", 5, "Showed up with the right rods, passed visual, and did not disappear at lunch.", "2026-09-15T18:00:00.000Z", ["Structural"], "PO 88"),
+    ],
+  },
+  {
+    id: "p_sarah",
+    userId: "u_sarah",
+    slug: "sarah-thompson",
+    name: "Sarah Thompson",
+    trade: "Electrical",
+    title: "Journeyman Electrician",
+    city: "San Diego",
+    region: "CA",
+    years: 8,
+    rate: "$48–70/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: true,
+    views: 274,
+    skills: ["Commercial TI", "Lighting", "Fire alarm assist", "Bend"],
+    about:
+      "Journeyman electrician. Tenant improvements, lighting retrofits, and the punch lists that decide whether a GC gets paid. I keep as-builts.",
+    credentials: [
+      cred("c_s1", "California General Electrician", "Journeyman", "DIR", "2021-07-22", "2027-07-22", "E-441290", "State license board record"),
+    ],
+    portfolio: [
+      work("w_s1", "Office lighting retrofit", "San Diego, CA", "LED swap across two floors with the circuits labeled to the panel schedule."),
+      work("w_s2", "Restaurant TI", "North Park, CA", "Kitchen circuits, hood shunt, and a final that passed without a correction notice."),
+    ],
+    reviews: [
+      review("r_s1", "Andre Cole", "San Diego, CA", 5, "She is who we call when the drawings and the ceiling do not agree.", "2026-10-03T18:00:00.000Z", ["Commercial"], "Job PT-19"),
+      review("r_s2", "Marisol Vega", "North Park, CA", 5, "Clean work, on the schedule we posted in the window for the inspector.", "2026-08-02T18:00:00.000Z", ["TI"], "Invoice #903"),
+    ],
+  },
+  {
+    id: "p_james",
+    userId: "u_james",
+    slug: "james-walker",
+    name: "James Walker",
+    trade: "Plumbing",
+    title: "Plumber",
+    city: "Coronado",
+    region: "CA",
+    years: 6,
+    rate: "$40–60/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: false,
+    backgroundChecked: false,
+    osha: false,
+    featured: false,
+    views: 88,
+    skills: ["Service", "Fixtures", "Drain cleaning"],
+    about:
+      "Service plumber on Coronado and the Silver Strand. Fixtures, drains, and water heaters. My liability policy lapsed in August and I am saying so here instead of hiding it.",
+    credentials: [
+      cred("c_j1", "Journeyman Plumber", "California", "State of California", "2023-03-01", "2027-03-01", "JP-220184", "State license board record"),
+      cred("c_j2", "OSHA 10", "Construction", "OSHA", "2021-05-05", "2026-05-05", "OSHA10-1002", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_j1", "Bath remodel rough", "Coronado, CA", "Moved a shower valve and kept the tile contractor on their date."),
+    ],
+    reviews: [
+      review("r_j1", "Pat Doyle", "Coronado, CA", 4, "Fixed a kitchen drain the same day. A bit quiet, but the work held.", "2026-09-09T18:00:00.000Z", ["Drain"], "Invoice #55"),
+    ],
+  },
+  {
+    id: "p_ethan_c",
+    userId: "u_ethan_c",
+    slug: "ethan-collins",
+    name: "Ethan Collins",
+    trade: "Carpentry",
+    title: "Carpenter",
+    city: "El Cajon",
+    region: "CA",
+    years: 10,
+    rate: "$42–64/hr",
+    availability: "Booking 2 weeks",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: false,
+    featured: false,
+    views: 176,
+    skills: ["Framing", "Stairs", "Remodels"],
+    about:
+      "Framing and remodel carpenter. I run a two-person crew for additions and the staircases that drawings always under-detail.",
+    credentials: [
+      cred("c_ec1", "California C-5", "Framing and rough carpentry", "CSLB", "2020-10-10", "2028-10-10", "C5-773201", "State license board record"),
+    ],
+    portfolio: [
+      work("w_ec1", "Room addition", "El Cajon, CA", "400 square feet, tied into an existing hip roof, dried in before the marine layer showed up."),
+      work("w_ec2", "Stair rebuild", "Santee, CA", "Replaced a wobbly run and matched the oak nosings."),
+    ],
+    reviews: [
+      review("r_ec1", "The Morales", "El Cajon, CA", 5, "Addition is square, the inspector was bored, and that is the review.", "2026-08-29T18:00:00.000Z", ["Framing"], "Permit B-190"),
+      review("r_ec2", "Jill Tran", "Santee, CA", 5, "Stairs do not creak. Kids noticed before we did.", "2026-05-17T18:00:00.000Z", ["Stairs"], "Invoice #318"),
+    ],
+  },
+  {
+    id: "p_liam",
+    userId: "u_liam",
+    slug: "liam-carter",
+    name: "Liam Carter",
+    trade: "Plumbing",
+    title: "Licensed Plumber",
+    city: "Vancouver",
+    region: "BC",
+    years: 7,
+    rate: "$42–60/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: false,
+    views: 154,
+    skills: ["Red Seal", "Service", "Hydronics", "Fixtures"],
+    about:
+      "Red Seal plumber in Vancouver. Service work and the rough-ins Bluewater already knows me for. I want a crew that documents the shutoff, not just the repair.",
+    credentials: [
+      cred("c_lc1", "Red Seal Plumber", "Interprovincial", "SkilledTradesBC", "2022-06-15", "2027-06-15", "RS-PL-44102", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_lc1", "Boiler zone repair", "Vancouver, BC", "Found a failed zone valve and a pump that was on its way out. Replaced both."),
+    ],
+    reviews: [
+      review("r_lc1", "Harbour Strata", "Vancouver, BC", 5, "On time for a Sunday leak. Building was back to normal before the Monday meeting.", "2026-10-05T18:00:00.000Z", ["Service"], "WO 88"),
+    ],
+  },
+  {
+    id: "p_noah",
+    userId: "u_noah",
+    slug: "noah-patel",
+    name: "Noah Patel",
+    trade: "Electrical",
+    title: "Electrician",
+    city: "Surrey",
+    region: "BC",
+    years: 5,
+    rate: "$38–55/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: false,
+    views: 121,
+    skills: ["Residential", "Panels", "Red Seal"],
+    about:
+      "Electrician in Surrey. Residential service changes and the new-home punch that never quite matches the drawings. Red Seal is current.",
+    credentials: [
+      cred("c_np1", "Red Seal Electrician", "Construction", "SkilledTradesBC", "2024-02-02", "2029-02-02", "RS-EL-22910", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_np1", "Panel replacement", "Surrey, BC", "100A to 200A, meter base included, inspection booked before we started."),
+    ],
+    reviews: [
+      review("r_np1", "Gurpreet Mann", "Surrey, BC", 5, "Explained the load calc in plain language. Inspection passed.", "2026-09-18T18:00:00.000Z", ["Panel"], "Permit EL-77"),
+    ],
+  },
+  {
+    id: "p_sophie",
+    userId: "u_sophie",
+    slug: "sophie-martin",
+    name: "Sophie Martin",
+    trade: "HVAC",
+    title: "HVAC Technician",
+    city: "Burnaby",
+    region: "BC",
+    years: 6,
+    rate: "$40–58/hr",
+    availability: "Booking 2 weeks",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: false,
+    featured: false,
+    views: 133,
+    skills: ["Heat pumps", "Hydronics assist", "EPA-equivalent handling"],
+    about:
+      "Heat pump technician working Burnaby and New Westminster. I commission equipment instead of just setting the thermostat and leaving.",
+    credentials: [
+      cred("c_sm1", "Refrigeration Mechanic", "Interprovincial", "SkilledTradesBC", "2023-09-09", "2028-09-09", "RS-RF-11820", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_sm1", "Ductless multi-split", "Burnaby, BC", "Four heads, one outdoor unit, line hide that the strata actually approved."),
+    ],
+    reviews: [
+      review("r_sm1", "Ellen Cho", "Burnaby, BC", 4, "House is finally even. She came back once to adjust a head we thought was loud. It was the mount.", "2026-09-01T18:00:00.000Z", ["Heat pump"], "Invoice #64"),
+    ],
+  },
+  {
+    id: "p_ewalsh",
+    userId: "u_ewalsh",
+    slug: "ethan-walsh",
+    name: "Ethan Walsh",
+    trade: "Pipefitting",
+    title: "Pipefitter",
+    city: "Richmond",
+    region: "BC",
+    years: 8,
+    rate: "$46–66/hr",
+    availability: "Limited",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: false,
+    views: 109,
+    skills: ["Steam", "Grooved", "Rigging"],
+    about:
+      "Pipefitter out of Richmond. Mechanical rooms, grooved mains, and the shutdown windows that do not move. I am booked through the end of the month.",
+    credentials: [
+      cred("c_ew1", "Red Seal Steamfitter", "Pipefitter", "SkilledTradesBC", "2021-12-01", "2026-12-01", "RS-ST-30012", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_ew1", "Mechanical room repipe", "Richmond, BC", "Replaced a corroded hot-water main over a weekend shutdown."),
+    ],
+    reviews: [
+      review("r_ew1", "Plant Supervisor", "Richmond, BC", 5, "Finished inside the window. Welds were where the drawings said they would be.", "2026-07-02T18:00:00.000Z", ["Shutdown"], "WO 12"),
+    ],
+  },
+  {
+    id: "p_maya",
+    userId: "u_maya",
+    slug: "maya-chen",
+    name: "Maya Chen",
+    trade: "Welding",
+    title: "Combination Welder",
+    city: "Austin",
+    region: "TX",
+    years: 13,
+    rate: "$50–75/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: true,
+    views: 240,
+    skills: ["TIG", "MIG", "Stainless", "Sanitary"],
+    about:
+      "Combination welder in Austin. Stainless and sanitary work for food and lab fit-outs, plus the structural jobs that pay the truck. Coupons available on request.",
+    credentials: [
+      cred("c_mc1", "AWS D1.1", "FCAW", "American Welding Society", "2025-04-04", "2027-04-04", "AWS-D11-8821", "Issuing body record"),
+      cred("c_mc2", "ASME IX", "TIG stainless", "ASME", "2024-08-19", "2027-08-19", "ASME-IX-229", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_mc1", "Sanitary stainless runs", "Austin, TX", "Orbital and hand TIG for a small bottling line. Borescope photos in the job file."),
+      work("w_mc2", "Stair stringers", "Round Rock, TX", "Shop-built stringers, fit up on site in one morning."),
+    ],
+    reviews: [
+      review("r_mc1", "Hill Country Mechanical", "Austin, TX", 5, "Clean stainless, no drama with the inspector, and she sent the WPS with the invoice.", "2026-10-02T18:00:00.000Z", ["Stainless"], "PO HC-77"),
+      review("r_mc2", "Jonah Peck", "Round Rock, TX", 5, "Stairs fit. That is the whole review and it is the one that matters.", "2026-06-20T18:00:00.000Z", ["Structural"], "Invoice #140"),
+    ],
+  },
+  {
+    id: "p_brooks",
+    userId: "u_brooks",
+    slug: "andre-brooks",
+    name: "Andre Brooks",
+    trade: "Mechanics",
+    title: "Diesel Mechanic",
+    city: "San Diego",
+    region: "CA",
+    years: 18,
+    rate: "$48–72/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: true,
+    backgroundChecked: true,
+    osha: true,
+    featured: false,
+    views: 167,
+    skills: ["Diesel", "Fleet", "Hydraulics", "Diagnostics"],
+    about:
+      "Diesel mechanic for vocational trucks and the small fleets that cannot afford a day of downtime. I write the fault code and the fix on the same sheet.",
+    credentials: [
+      cred("c_ab1", "ASE T2", "Diesel engines", "ASE", "2023-01-15", "2028-01-15", "ASE-T2-99102", "Issuing body record"),
+      cred("c_ab2", "ASE T8", "Preventive maintenance", "ASE", "2023-01-15", "2028-01-15", "ASE-T8-99103", "Issuing body record"),
+    ],
+    portfolio: [
+      work("w_ab1", "Fleet PM program", "San Diego, CA", "Six vocational trucks moved onto a mileage sheet. Two injectors caught before a road call."),
+    ],
+    reviews: [
+      review("r_ab1", "Harbor Fleet", "San Diego, CA", 5, "Truck was back before the morning route. He called when the part landed, not after.", "2026-09-12T18:00:00.000Z", ["Fleet"], "RO 4419"),
+    ],
+  },
+  {
+    id: "p_priya",
+    userId: "u_priya",
+    slug: "priya-shah",
+    name: "Priya Shah",
+    trade: "Electrical",
+    title: "Residential Electrician",
+    city: "Austin",
+    region: "TX",
+    years: 4,
+    rate: "$36–52/hr",
+    availability: "Available now",
+    licensed: true,
+    insured: true,
+    backgroundChecked: false,
+    osha: false,
+    featured: false,
+    views: 97,
+    skills: ["Residential", "Troubleshooting", "Lighting"],
+    about:
+      "Residential electrician in Austin. Service calls, lighting, and the occasional panel. My journeyman license is active. Background check is not on file yet, and the profile says so.",
+    credentials: [
+      cred("c_ps1", "Texas Journeyman Electrician", "Electrical", "TDLR", "2024-11-11", "2027-11-11", "JE-882190", "State license board record"),
+      cred("c_ps2", "OSHA 10", "Construction", "OSHA", "2026-09-01", "2031-09-01", "OSHA10-PENDING", "Waiting on card image", "pending"),
+    ],
+    portfolio: [
+      work("w_ps1", "Kitchen lighting", "Austin, TX", "Recessed layout that matches the cabinet lines, dimmers that do not buzz."),
+    ],
+    reviews: [
+      review("r_ps1", "Noah Ellis", "Austin, TX", 5, "Found an open neutral the previous two visits had missed. Fair price.", "2026-10-08T18:00:00.000Z", ["Troubleshooting"], "Invoice #19"),
+    ],
+  },
+];
+
+const jobs: Job[] = [
+  job("j_plumber", "c_bluewater", "Licensed Plumber", "Plumbing", "Vancouver", "BC", "Full-time", "$38–48/hr", "2026-10-08T15:00:00.000Z", "Service and small construction for a Metro Vancouver shop that already has the vans and the dispatch.", ["Red Seal plumber or equivalent", "Able to document shutoffs and photos on every ticket", "Valid driver license", "Comfortable on strata and residential calls"]),
+  job("j_elec", "c_bluewater", "Journeyman Electrician", "Electrical", "Surrey", "BC", "Full-time", "$40–52/hr", "2026-10-07T15:00:00.000Z", "We keep a bench electrician for the mechanical rooms we already maintain and the service changes those buildings need.", ["Red Seal electrician", "Panel and lighting experience", "Able to pull permits with the contractor of record", "OSHA or provincial safety orientation"]),
+  job("j_hvac", "c_bluewater", "HVAC Technician", "HVAC", "Burnaby", "BC", "Full-time", "$36–48/hr", "2026-10-06T15:00:00.000Z", "Heat pumps and rooftop units on buildings where we already run the plumbing. You will not be selling maintenance plans.", ["Refrigeration or HVAC ticket", "Heat pump commissioning", "Able to write a work order a dispatcher can read", "Valid driver license"]),
+  job("j_pipe", "c_bluewater", "Pipefitter", "Pipefitting", "Richmond", "BC", "Contract", "$48–62/hr", "2026-10-05T15:00:00.000Z", "Weekend and shutdown work on hot water and heating mains. The windows do not move.", ["Steamfitter / pipefitter ticket", "Grooved and welded pipe", "Shutdown experience", "Able to pass a site orientation"]),
+  job("j_carp", "c_pacific", "Finish Carpenter", "Carpentry", "San Diego", "CA", "Full-time", "$32–46/hr", "2026-10-04T15:00:00.000Z", "Doors, trim, and the finish package on remodels between North Park and La Mesa.", ["Finish carpentry portfolio", "Able to hang and case doors", "Insured", "Works clean in occupied houses"]),
+  job("j_weld", "c_pacific", "Structural Welder", "Welding", "National City", "CA", "Contract", "$44–64/hr", "2026-10-03T15:00:00.000Z", "Field welding on a small retrofit. Coupons and a current D1.1 ticket are the interview.", ["Current AWS D1.1", "Field weld photos", "Own hood and leads", "Able to work a day shift on site"]),
+  job("j_hvac2", "c_hill", "HVAC Install Lead", "HVAC", "Austin", "TX", "Full-time", "$28–40/hr + production", "2026-10-09T15:00:00.000Z", "Lead a two-person install crew through changeout season. We supply the helper, the van, and the warehouse.", ["EPA 608", "Changeout experience", "Able to pull a TDLR permit with the company", "Driver license and a clean truck record"]),
+  job("j_elec2", "c_hill", "Maintenance Electrician", "Electrical", "Austin", "TX", "Full-time", "$30–42/hr", "2026-10-02T15:00:00.000Z", "Keep the shop, the warehouse, and a handful of light commercial customers from calling a second company.", ["Texas journeyman electrician", "Troubleshooting first, replacement second", "Comfortable on a ladder and a roof", "Insured status confirmed"]),
+];
+
+function job(
+  id: string,
+  companyId: string,
+  title: string,
+  trade: Job["trade"],
+  city: string,
+  region: string,
+  type: Job["type"],
+  pay: string,
+  createdAt: string,
+  description: string,
+  requirements: string[],
+): Job {
+  return { id, companyId, title, trade, city, region, type, pay, createdAt, description, requirements };
+}
+
+const applications: Application[] = [
+  { id: "a1", jobId: "j_plumber", professionalId: "p_liam", note: "Red Seal is current. I can start on the 20th and I already know the strata boards in Kits and Mount Pleasant.", status: "New", createdAt: "2026-10-11T16:00:00.000Z" },
+  { id: "a2", jobId: "j_elec", professionalId: "p_noah", note: "Journeyman in Surrey. Panel photos are on my profile. I can interview this week.", status: "Shortlisted", createdAt: "2026-10-10T16:00:00.000Z" },
+  { id: "a3", jobId: "j_hvac", professionalId: "p_sophie", note: "Heat pumps are most of my week. Happy to ride along on a Burnaby service day before you decide.", status: "In Review", createdAt: "2026-10-09T16:00:00.000Z" },
+  { id: "a4", jobId: "j_pipe", professionalId: "p_ewalsh", note: "I am booked through the end of October. If the shutdown can wait until November I want the work.", status: "Not Selected", createdAt: "2026-10-08T16:00:00.000Z" },
+];
+
+const threads: Thread[] = [
+  { id: "t1", participantIds: ["u_ethan", "u_marcus"], updatedAt: "2026-10-11T19:12:00.000Z" },
+  { id: "t2", participantIds: ["u_pacific", "u_brandon"], updatedAt: "2026-10-10T17:40:00.000Z" },
+];
+
+const messages: Message[] = [
+  { id: "m1", threadId: "t1", senderId: "u_ethan", body: "Marcus, we have a mechanical room in Burnaby that needs a second set of eyes on a heat pump tied to our boiler loop. Are you taking work outside Austin?", createdAt: "2026-10-11T18:02:00.000Z", read: true },
+  { id: "m2", threadId: "t1", senderId: "u_marcus", body: "I can do a consult week of the 27th if the travel is covered. Send the model number and I will tell you if it is worth the flight.", createdAt: "2026-10-11T19:12:00.000Z", read: false },
+  { id: "m3", threadId: "t2", senderId: "u_pacific", body: "Brandon, the National City retrofit needs a D1.1 welder for four days. Coupon on day one. You interested?", createdAt: "2026-10-10T17:40:00.000Z", read: true },
+];
+
+const notifications: Notification[] = [
+  { id: "n1", userId: "u_ethan", title: "New application", body: "Liam Carter applied to Licensed Plumber.", href: "/dashboard", createdAt: "2026-10-11T16:00:00.000Z", read: false },
+  { id: "n2", userId: "u_marcus", title: "New message", body: "Ethan Reynolds sent you a message.", href: "/messages?with=u_ethan", createdAt: "2026-10-11T18:02:00.000Z", read: true },
+  { id: "n3", userId: "u_noah", title: "Application update", body: "Bluewater Plumbing shortlisted you for Journeyman Electrician.", href: "/dashboard", createdAt: "2026-10-10T20:00:00.000Z", read: false },
+];
+
+export function createSeedState(): AppState {
+  return {
+    version: 1,
+    users,
+    professionals,
+    companies,
+    jobs,
+    applications,
+    threads,
+    messages,
+    notifications,
+    savedPros: { u_ethan: ["p_liam", "p_noah", "p_sarah"] },
+    savedJobs: { u_marcus: ["j_hvac2"] },
+    memberships: { u_marcus: ["g-hvac"], u_liam: ["g-plumbing"], u_derek: ["g-electrical"], u_brandon: ["g-welding"] },
+    groupPosts: SEED_POSTS,
+    leads: [],
+    sessionUserId: null,
+  };
+}

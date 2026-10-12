@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+:root {
+  --canvas: #f4f7fb;
+  --surface: #ffffff;
+  --ink: #0f172a;
+  --muted: #5b6b80;
+  --line: #e2e8f0;
+  --soft: #eef3f9;
+  --navy: #0b1f3a;
+  --brand: #2563eb;
+  --accent: #f97316;
+  --good: #15803d;
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --canvas: #0b1120;
+  --surface: #131c31;
+  --ink: #f1f5f9;
+  --muted: #94a3b8;
+  --line: rgba(255, 255, 255, 0.1);
+  --soft: #0f172a;
+  --navy: #08162c;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-soft: var(--soft);
+  --color-navy: var(--navy);
+  --color-brand: var(--brand);
+  --color-accent: var(--accent);
+  --color-good: var(--good);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+::selection { background: #bfdbfe; color: #0f172a; }
+
+.hero-grid {
+  background-image:
+    radial-gradient(900px 420px at 85% 0%, rgba(255, 255, 255, 0.16), transparent 55%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: auto, 28px 28px;
+}
