@@ -21,6 +21,7 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   keywords: ['trades', 'HVAC', 'plumbing', 'electrician', 'welder', 'carpenter', 'jobs', 'verified'],
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

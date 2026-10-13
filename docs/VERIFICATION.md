@@ -41,3 +41,9 @@ EPA 608 and most issuer certs have **no public API** — those always go to manu
 ```
 
 Called automatically on submission; admins can also trigger via **Run auto-verify** in the admin panel.
+
+## Pilot without API keys
+
+Manual review is the working path for the local pilot. A tradesperson uploads a document to the private `certifications` bucket and the row stays `pending` until an admin records a method, source, and notes in `/dashboard/admin/certifications`. Approving it sets `profiles.is_verified`. Texas TDLR and TradeProof run only when their env vars and `SUPABASE_SERVICE_ROLE_KEY` are present; otherwise the credential stays in the queue.
+
+`supabase db reset` applies `001` through `004`. Migration `004_security_and_search.sql` keeps this schema and adds the signup role lock, private helpers, and the rule that a tradesperson cannot change verification fields.
