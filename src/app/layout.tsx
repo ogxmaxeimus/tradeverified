@@ -1,35 +1,33 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { Header } from "@/components/ui";
-import { getViewer } from "@/lib/session";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/constants';
+import './globals.css';
 
-const inter = Inter({ subsets: ["latin"] });
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
 
-export const dynamic = "force-dynamic";
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
 
 export const metadata: Metadata = {
   title: {
-    default: "TradeVerified",
-    template: "%s · TradeVerified",
+    default: `${SITE_NAME} - Professional Network for Skilled Trades`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description: "Verified profiles, licenses, and jobs for skilled trades workers and the employers who hire them.",
-  robots: { index: false, follow: false },
+  description: SITE_DESCRIPTION,
+  keywords: ['trades', 'HVAC', 'plumbing', 'electrician', 'welder', 'carpenter', 'jobs', 'verified'],
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
-  const viewer = await getViewer();
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Header viewer={viewer} />
-        <main className="mx-auto min-h-[70vh] max-w-6xl px-4 py-8">{children}</main>
-        <footer className="border-t border-slate-200 px-4 py-6 text-center text-sm text-slate-500">
-          TradeVerified pilot. Credential checks are manual. Workers can apply for free.
-        </footer>
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full`}>
+      <body className="min-h-full flex flex-col font-sans antialiased">
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

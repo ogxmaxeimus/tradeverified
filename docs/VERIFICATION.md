@@ -1,34 +1,43 @@
-# Verification
+# Automated Credential Verification
 
-A verified badge means a TradeVerified reviewer approved at least one license or certification on that worker. It does not mean a state board API returned a live record. The concept site describes automated checks; the pilot does the manual version of that same loop.
+How TradeVerified checks licenses and certifications automatically — and what you need to configure.
 
-## What the worker submits
+## How it works
 
-- Kind: license or certification
-- Name, issuing authority, and optional number
-- Optional state and issue / expiration dates
-- A PDF or image of the document, stored in the private `credentials` bucket under that worker's user id
+When a tradesperson submits a credential:
 
-New rows are always `pending`. Workers cannot insert or update a row as `approved`. The database enforces that with a column grant and an insert policy.
+1. **Format validation** — rejects missing license numbers, expired dates, or invalid formats instantly.
+2. **Automated lookup** — queries official or third-party sources based on state and cert type.
+3. **Outcome:**
+   - **Verified** — license found and active; badge applied immediately with provenance.
+   - **Rejected** — license not found or inactive on the official source.
+   - **Manual review** — no automated source available; queued for admin with notes.
 
-## What the reviewer does
+Every step is logged in `certification_verification_events`.
 
-1. Sign in with an account whose `profiles.role` is `admin`.
-2. Open `/admin`.
-3. Read the issuing authority, number, dates, and the uploaded file (a short-lived signed URL).
-4. Approve or reject, with a note about what was checked.
+## What's automated today
 
-Approving one credential sets `worker_profiles.verification_status` to `verified` and stamps `verified_at`. If every approved credential is later removed and a pending one remains, the badge returns to `pending`. If only rejections remain, it becomes `rejected`. With no credentials left, it is `unverified`. A trigger does this; the app does not trust the client to set the badge.
+| Source | Coverage | Cost | Env var |
+|---|---|---|---|
+| **Texas Open Data (TDLR)** | TX electricians, HVAC, etc. | Free | `TEXAS_OPEN_DATA_TOKEN` (optional) |
+| **TradeProof** | FL, CA, TX, and more | Paid API key | `TRADEPROOF_API_KEY` |
+| **Manual review** | EPA 608, NATE, AWS, ASE, OSHA, other states | — | — |
 
-Public profiles list approved credentials only: name, authority, number, state, dates, and the review date. Pending files stay private to the worker and admins.
+EPA 608 and most issuer certs have **no public API** — those always go to manual review against the issuing body's portal.
 
-## What v1 does not verify
+## Setup
 
-- That the document is genuine, beyond a human looking at it
-- Government ID, insurance, or background checks
-- Customer reviews
-- That a license is still active on the day someone is hired
+1. Run migrations `002_certification_verification.sql` and `003_auto_verification.sql` in Supabase.
+2. Ensure `SUPABASE_SERVICE_ROLE_KEY` is set (required for auto-verify to write results).
+3. Optional: add `TRADEPROOF_API_KEY` for instant multi-state checks beyond Texas.
+4. Optional: add `TEXAS_OPEN_DATA_TOKEN` from [data.texas.gov](https://data.texas.gov/profile/app_tokens) for higher rate limits.
 
-## Later checks
+## API
 
-When a board or issuer has a usable lookup, store the source, the reference number, the date checked, and whether the check was automatic or manual. Keep the manual queue for issuers that have no API. Do not hide a failed automatic check behind a verified badge.
+`POST /api/certifications/verify`
+
+```json
+{ "certification_id": "uuid" }
+```
+
+Called automatically on submission; admins can also trigger via **Run auto-verify** in the admin panel.
