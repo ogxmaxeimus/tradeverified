@@ -9,18 +9,22 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import type { UserRole } from '@/types/database';
+import { TRADES } from '@/lib/constants';
+import { Select } from '@/components/ui/select';
 
 function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const defaultRole = (searchParams.get('role') as UserRole) || 'tradesperson';
+  const requested = searchParams.get('role');
+  const defaultRole = requested === 'employer' ? 'employer' : 'tradesperson';
 
-  const [role, setRole] = useState<UserRole>(defaultRole);
+  const [role, setRole] = useState<'tradesperson' | 'employer'>(defaultRole);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [trade, setTrade] = useState('hvac');
+  const [companyName, setCompanyName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +38,13 @@ function SignupForm() {
       email,
       password,
       options: {
-        data: { role, first_name: firstName, last_name: lastName },
+        data: {
+          role,
+          first_name: firstName,
+          last_name: lastName,
+          trade: role === 'tradesperson' ? trade : undefined,
+          company_name: role === 'employer' ? companyName : undefined,
+        },
       },
     });
 
@@ -83,6 +93,17 @@ function SignupForm() {
           </div>
           <Input id="email" label="Email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
           <Input id="password" label="Password" type="password" placeholder="Min. 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
+          {role === 'tradesperson' ? (
+            <Select
+              id="trade"
+              label="Trade"
+              value={trade}
+              onChange={(e) => setTrade(e.target.value)}
+              options={TRADES.map((item) => ({ value: item.value, label: item.label }))}
+            />
+          ) : (
+            <Input id="company" label="Company name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+          )}
           {error && <p className="text-sm text-red-500">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? 'Creating account...' : 'Create Account'}

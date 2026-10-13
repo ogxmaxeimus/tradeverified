@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Briefcase, Users, Eye, FileText } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 export async function EmployerDashboard({ userId }: { userId: string }) {

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { ExternalLink, FileText, ShieldCheck, XCircle, Zap } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
@@ -41,18 +40,24 @@ export default function AdminCertificationsPage() {
   const [reference, setReference] = useState('');
   const [notes, setNotes] = useState('');
   const [rejectReason, setRejectReason] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
-  useEffect(() => { load(); }, []);
-
-  async function load() {
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('tradesperson_certifications')
-      .select('*, certification:certifications(name, issuing_body, verification_url, default_method), tradesperson:tradesperson_profiles(profile:profiles(first_name, last_name))')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false });
-    setCerts(data ?? []);
-  }
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('tradesperson_certifications')
+        .select('*, certification:certifications(name, issuing_body, verification_url, default_method), tradesperson:tradesperson_profiles(profile:profiles(first_name, last_name))')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+      if (!cancelled) setCerts(data ?? []);
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadKey]);
 
   function startReview(cert: CertRequest, m: 'verify' | 'reject') {
     setActiveId(cert.id);
@@ -82,7 +87,7 @@ export default function AdminCertificationsPage() {
         setCerts((prev) => prev.filter((c) => c.id !== certId));
         if (activeId === certId) cancelReview();
       } else if (res.ok) {
-        await load();
+        setReloadKey((key) => key + 1);
       }
     } finally {
       setAutoBusyId(null);

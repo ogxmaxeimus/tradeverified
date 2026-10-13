@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, MapPin, Bookmark, X } from 'lucide-react';
 import { Navbar } from '@/components/layout/navbar';
 import { Footer } from '@/components/layout/footer';
@@ -17,6 +18,7 @@ import { formatCurrency, formatDate } from '@/lib/utils';
 import type { Job } from '@/types/database';
 
 export default function JobsPage() {
+  const router = useRouter();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [trade, setTrade] = useState('');
   const [state, setState] = useState('');
@@ -27,26 +29,31 @@ export default function JobsPage() {
   const [applyError, setApplyError] = useState('');
   const [appliedIds, setAppliedIds] = useState<string[]>([]);
 
-  useEffect(() => { loadJobs(); }, [trade, state]);
-
-  async function loadJobs() {
-    const supabase = createClient();
-    let q = supabase.from('jobs').select('*, company:companies(name, logo_url)').eq('status', 'active').order('created_at', { ascending: false }).limit(30);
-    if (trade) q = q.eq('trade', trade);
-    if (state) q = q.eq('state', state);
-    const { data } = await q;
-    let results = data ?? [];
-    if (query) {
-      const lower = query.toLowerCase();
-      results = results.filter((j: Job) => j.title.toLowerCase().includes(lower) || j.description.toLowerCase().includes(lower));
+  useEffect(() => {
+    let cancelled = false;
+    async function loadJobs() {
+      const supabase = createClient();
+      let q = supabase.from('jobs').select('*, company:companies(name, logo_url)').eq('status', 'active').order('created_at', { ascending: false }).limit(30);
+      if (trade) q = q.eq('trade', trade);
+      if (state) q = q.eq('state', state);
+      const { data } = await q;
+      let results = data ?? [];
+      if (query) {
+        const lower = query.toLowerCase();
+        results = results.filter((j: Job) => j.title.toLowerCase().includes(lower) || j.description.toLowerCase().includes(lower));
+      }
+      if (!cancelled) setJobs(results);
     }
-    setJobs(results);
-  }
+    loadJobs();
+    return () => {
+      cancelled = true;
+    };
+  }, [trade, state, query]);
 
   async function openApply(job: Job) {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { window.location.href = '/login?redirect=/jobs'; return; }
+    if (!user) { router.push('/login?redirect=/jobs'); return; }
     setApplyError('');
     setCoverLetter('');
     setApplyJob(job);
@@ -79,7 +86,7 @@ export default function JobsPage() {
   async function handleSave(jobId: string) {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { window.location.href = '/login?redirect=/jobs'; return; }
+    if (!user) { router.push('/login?redirect=/jobs'); return; }
     await supabase.from('saved_jobs').upsert({ user_id: user.id, job_id: jobId });
   }
 
@@ -94,11 +101,10 @@ export default function JobsPage() {
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input placeholder="Search jobs..." value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && loadJobs()} className="pl-10" />
+                <Input placeholder="Search jobs..." value={query} onChange={(e) => setQuery(e.target.value)} className="pl-10" />
               </div>
               <Select value={trade} onChange={(e) => setTrade(e.target.value)} options={[{ value: '', label: 'All Trades' }, ...TRADES.map((t) => ({ value: t.value, label: t.label }))]} />
               <Select value={state} onChange={(e) => setState(e.target.value)} options={[{ value: '', label: 'All States' }, ...US_STATES.map((s) => ({ value: s, label: s }))]} />
-              <Button onClick={loadJobs}>Search</Button>
             </div>
           </div>
         </div>
